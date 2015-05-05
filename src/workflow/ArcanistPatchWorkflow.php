@@ -577,25 +577,20 @@ EOTEXT
         $this->createParentDirectoryOf($add);
       }
 
-      // TODO: The SVN patch workflow likely does not work on windows because
-      // of the (cd ...) stuff.
-
       foreach ($copies as $copy) {
         list($src, $dst) = $copy;
-        passthru(
-          csprintf(
-            '(cd %s; svn cp %s %s)',
-            $repository_api->getPath(),
-            ArcanistSubversionAPI::escapeFileNameForSVN($src),
-            ArcanistSubversionAPI::escapeFileNameForSVN($dst)));
+        $repository_api->execPassthru(
+          'cp %s %s',
+          ArcanistSubversionAPI::escapeFileNameForSVN($src),
+          ArcanistSubversionAPI::escapeFileNameForSVN($dst)
+        );
       }
 
       foreach ($deletes as $delete) {
-        passthru(
-          csprintf(
-            '(cd %s; svn rm %s)',
-            $repository_api->getPath(),
-            ArcanistSubversionAPI::escapeFileNameForSVN($delete)));
+        $repository_api->execPassthru(
+          'rm %s',
+          ArcanistSubversionAPI::escapeFileNameForSVN($delete)
+        );
       }
 
       foreach ($symlinks as $symlink) {
@@ -606,12 +601,13 @@ EOTEXT
           case ArcanistDiffChangeType::TYPE_CHANGE:
           case ArcanistDiffChangeType::TYPE_MOVE_HERE:
           case ArcanistDiffChangeType::TYPE_COPY_HERE:
-            execx(
-              '(cd %s && ln -sf %s %s)',
-              $repository_api->getPath(),
+            $future = new ExecFuture(
+              'ln -sf %s %s',
               $link_target,
-              $link_path);
-            break;
+              $link_path
+            );
+            $future->setCWD($repository_api->getPath());
+            $future->resolvex();
         }
       }
 
@@ -620,19 +616,13 @@ EOTEXT
         if ($patch) {
           $tmp = new TempFile();
           Filesystem::writeFile($tmp, $patch);
-          passthru(
-            csprintf(
-              '(cd %s; patch -p0 < %s)',
-              $repository_api->getPath(),
-              $tmp),
-            $err);
+          $passthru = new PhutilExecPassthru('patch -p0 -i %s', $tmp);
+          $passthru->setCWD($repository_api->getPath());
+          $err = $passthru->execute();
         } else {
-          passthru(
-            csprintf(
-              '(cd %s; touch %s)',
-              $repository_api->getPath(),
-              $path),
-            $err);
+          $passthru = new PhutilExecPassthru('touch %s', $path);
+          $passthru->setCWD($repository_api->getPath());
+          $err = $passthru->execute();
         }
         if ($err) {
           $patch_err = max($patch_err, $err);
@@ -640,11 +630,10 @@ EOTEXT
       }
 
       foreach ($adds as $add) {
-        passthru(
-          csprintf(
-            '(cd %s; svn add %s)',
-            $repository_api->getPath(),
-            ArcanistSubversionAPI::escapeFileNameForSVN($add)));
+        $repository_api->execPassthru(
+          'add %s',
+          ArcanistSubversionAPI::escapeFileNameForSVN($add)
+        );
       }
 
       foreach ($propset as $path => $changes) {
@@ -655,20 +644,18 @@ EOTEXT
             $value = (octdec($value) & 0111 ? 'on' : null);
           }
           if ($value === null) {
-            passthru(
-              csprintf(
-                '(cd %s; svn propdel %s %s)',
-                $repository_api->getPath(),
-                $prop,
-                ArcanistSubversionAPI::escapeFileNameForSVN($path)));
+            $repository_api->execPassthru(
+              'propdel %s %s',
+              $prop,
+              ArcanistSubversionAPI::escapeFileNameForSVN($path)
+            );
           } else {
-            passthru(
-              csprintf(
-                '(cd %s; svn propset %s %s %s)',
-                $repository_api->getPath(),
-                $prop,
-                $value,
-                ArcanistSubversionAPI::escapeFileNameForSVN($path)));
+            $repository_api->execPassthru(
+              'propset %s %s %s',
+              $prop,
+              $value,
+              ArcanistSubversionAPI::escapeFileNameForSVN($path)
+            );
           }
         }
       }
@@ -1071,15 +1058,10 @@ EOTEXT
     } else {
       // Make sure the parent directory exists before we make this one.
       $this->createParentDirectoryOf($dir);
-      execx(
-        '(cd %s && mkdir %s)',
-        $repository_api->getPath(),
-        $dir);
-      passthru(
-        csprintf(
-          '(cd %s && svn add %s)',
-          $repository_api->getPath(),
-          $dir));
+      $future = new ExecFuture('mkdir %s', $dir);
+      $future->setCWD($repository_api->getPath());
+      $future->resolvex();
+      $repository_api->execPassthru('add %s', $dir);
     }
   }
 

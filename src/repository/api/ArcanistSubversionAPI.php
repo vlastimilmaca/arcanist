@@ -44,6 +44,17 @@ final class ArcanistSubversionAPI extends ArcanistRepositoryAPI {
     return $future;
   }
 
+  public function execPassthru($pattern /* , ... */) {
+
+    $args = func_get_args();
+
+    $args[0] = 'svn ' . $args[0];
+
+    $passthru = newv('PhutilExecPassthru', $args);
+    $passthru->setCWD($this->getPath());
+    return $passthru->execute();
+  }
+
   protected function buildCommitRangeStatus() {
     // In SVN, there are never any previous commits in the range -- it is all in
     // the uncommitted status.
