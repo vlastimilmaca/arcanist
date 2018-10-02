@@ -704,8 +704,8 @@ final class ExecFuture extends PhutilExecutableFuture {
       if (!$is_windows) {
 
         // On Windows, we redirect process standard output and standard error
-        // through temporary files, and then use stream_select to determine
-        // if there's more data to read.
+        // through temporary files. Files don't block, so we don't need to make
+        // these streams nonblocking.
 
         if ((!stream_set_blocking($stdout, false)) ||
             (!stream_set_blocking($stderr, false)) ||
