@@ -3,7 +3,7 @@
 final class XHPASTNodeTestCase extends PhutilTestCase {
 
   public function testGetStringVariables() {
-    $this->requireXHPAST();
+    $this->assertExecutable('xhpast');
 
     $this->assertStringVariables(array(), '""');
     $this->assertStringVariables(array(2 => 'abc'), '"$abc"');
@@ -22,7 +22,7 @@ final class XHPASTNodeTestCase extends PhutilTestCase {
   }
 
   private function assertStringVariables($expected, $string) {
-    $this->requireXHPAST();
+    $this->assertExecutable('xhpast');
 
     $statement = XHPASTTree::newStatementFromString($string);
     $this->assertEqual(
@@ -32,7 +32,7 @@ final class XHPASTNodeTestCase extends PhutilTestCase {
   }
 
   public function testGetNamespace() {
-    $this->requireXHPAST();
+    $this->assertExecutable('xhpast');
 
     $dir   = dirname(__FILE__).'/namespace/';
     $files = id(new FileFinder($dir))
@@ -102,14 +102,6 @@ final class XHPASTNodeTestCase extends PhutilTestCase {
     $expect = phutil_json_decode($expect);
 
     return array($tree, $expect);
-  }
-
-  private function requireXHPAST() {
-    if (!PhutilXHPASTBinary::makeAvailable()) {
-      $this->assertSkipped(
-        pht(
-          'XHPAST binary is not available and could not be built.'));
-    }
   }
 
 }

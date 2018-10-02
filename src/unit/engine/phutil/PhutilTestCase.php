@@ -760,4 +760,32 @@ abstract class PhutilTestCase extends Phobject {
     throw new PhutilTestTerminatedException($output);
   }
 
+  final protected function assertExecutable($binary) {
+    static $executables = array();
+
+    if (!isset($executables[$binary])) {
+      switch ($binary) {
+        case 'xhpast':
+          $ok = true;
+          if (!PhutilXHPASTBinary::isAvailable()) {
+            try {
+              PhutilXHPASTBinary::build();
+            } catch (Exception $ex) {
+              $ok = false;
+            }
+          }
+          break;
+        default:
+          $ok = Filesystem::binaryExists($binary);
+          break;
+      }
+      $executable[$binary] = $ok;
+    }
+
+    if (!$executable[$binary]) {
+      $this->assertSkipped(
+        pht('Required executable "%s" is not available.', $binary));
+    }
+  }
+
 }

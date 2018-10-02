@@ -6,11 +6,7 @@
 final class XHPASTTreeTestCase extends PhutilTestCase {
 
   public function testEvalStaticString() {
-    if (!PhutilXHPASTBinary::makeAvailable()) {
-      $this->assertSkipped(
-        pht(
-          'XHPAST binary is not available and could not be built.'));
-    }
+    $this->assertExecutable('xhpast');
 
     $this->assertEval(1,    '1');
     $this->assertEval('a',  '"a"');
