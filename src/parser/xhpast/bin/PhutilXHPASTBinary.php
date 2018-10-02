@@ -131,4 +131,21 @@ final class PhutilXHPASTBinary extends Phobject {
     return self::getVersion() == self::EXPECTED_VERSION;
   }
 
+  public static function makeAvailable() {
+    static $is_available;
+
+    if ($is_available == null) {
+      $is_available = true;
+      if (!self::isAvailable()) {
+        try {
+          self::build();
+        } catch (Exception $ex) {
+          $is_available = false;
+        }
+      }
+    }
+
+    return $is_available;
+  }
+
 }
