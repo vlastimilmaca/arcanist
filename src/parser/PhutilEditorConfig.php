@@ -163,12 +163,11 @@ final class PhutilEditorConfig extends Phobject {
    * return list<pair<string, map>>
    */
   private function getEditorConfigs($path) {
-    $configs    = array();
-    $found_root = false;
-    $root       = $this->root;
+    $configs = array();
 
-    do {
-      $path = dirname($path);
+    $found_root = false;
+    $paths = Filesystem::walkToRoot($path, $this->root);
+    foreach ($paths as $path) {
       $file = $path.'/.editorconfig';
 
       if (!Filesystem::pathExists($file)) {
@@ -187,7 +186,7 @@ final class PhutilEditorConfig extends Phobject {
       if ($found_root) {
         break;
       }
-    } while ($path != $root && Filesystem::isDescendant($path, $root));
+    }
 
     return $configs;
   }
