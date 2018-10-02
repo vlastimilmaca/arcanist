@@ -6,15 +6,24 @@ final class ExecFutureTestCase extends PhutilTestCase {
     // NOTE: This is mostly testing that we don't hang while doing an empty
     // write.
 
-    list($stdout) = id(new ExecFuture('cat'))->write('')->resolvex();
+    list($stdout) = $this->newCat()
+      ->write('')
+      ->resolvex();
 
     $this->assertEqual('', $stdout);
+  }
+
+  private function newCat() {
+    $root = dirname(phutil_get_library_root('arcanist'));
+    $bin = $root.'/support/unit/cat.php';
+
+    return new ExecFuture('php -f %R', $bin);
   }
 
   public function testKeepPipe() {
     // NOTE: This is mostly testing the semantics of $keep_pipe in write().
 
-    list($stdout) = id(new ExecFuture('cat'))
+    list($stdout) = $this->newCat()
       ->write('', true)
       ->start()
       ->write('x', true)
@@ -30,14 +39,14 @@ final class ExecFutureTestCase extends PhutilTestCase {
     // flushing a buffer.
 
     $data = str_repeat('x', 1024 * 1024 * 4);
-    list($stdout) = id(new ExecFuture('cat'))->write($data)->resolvex();
+    list($stdout) = $this->newCat()->write($data)->resolvex();
 
     $this->assertEqual($data, $stdout);
   }
 
   public function testBufferLimit() {
     $data = str_repeat('x', 1024 * 1024);
-    list($stdout) = id(new ExecFuture('cat'))
+    list($stdout) = $this->newCat()
       ->setStdoutSizeLimit(1024)
       ->write($data)
       ->resolvex();
@@ -114,7 +123,7 @@ final class ExecFutureTestCase extends PhutilTestCase {
     $str_len_4 = 'abcd';
 
     // This is a write/read with no read buffer.
-    $future = new ExecFuture('cat');
+    $future = $this->newCat();
     $future->write($str_len_8);
 
     do {
@@ -131,7 +140,7 @@ final class ExecFutureTestCase extends PhutilTestCase {
 
 
     // This is a write/read with a read buffer.
-    $future = new ExecFuture('cat');
+    $future = $this->newCat();
     $future->write($str_len_8);
 
     // Set the read buffer size.

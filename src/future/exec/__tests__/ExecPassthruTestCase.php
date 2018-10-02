@@ -8,7 +8,10 @@ final class ExecPassthruTestCase extends PhutilTestCase {
     // the terminal, which is undesirable). This makes crafting effective unit
     // tests a fairly involved process.
 
-    $exec = new PhutilExecPassthru('exit');
+    $root = dirname(phutil_get_library_root('arcanist'));
+    $bin = $root.'/support/unit/exit.php';
+
+    $exec = new PhutilExecPassthru('php -f %R', $bin);
     $err = $exec->execute();
     $this->assertEqual(0, $err);
   }

@@ -43,7 +43,10 @@ final class LinesOfALargeExecFutureTestCase extends PhutilTestCase {
   }
 
   private function writeAndRead($write, $read) {
-    $future = new ExecFuture('cat');
+    $root = dirname(phutil_get_library_root('arcanist'));
+    $bin = $root.'/support/unit/cat.php';
+
+    $future = new ExecFuture('php -f %R', $bin);
     $future->write($write);
 
     $lines = array();

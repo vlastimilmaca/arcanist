@@ -209,8 +209,12 @@ final class FileFinderTestCase extends PhutilTestCase {
   private function assertFinder($label, FileFinder $finder, $expect) {
     $modes = array(
       'php',
-      'shell',
     );
+
+    if (!phutil_is_windows()) {
+      $modes[] = 'shell';
+    }
+
     foreach ($modes as $mode) {
       $actual = id(clone $finder)
         ->setForceMode($mode)

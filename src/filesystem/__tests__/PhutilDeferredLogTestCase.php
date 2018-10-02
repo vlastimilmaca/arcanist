@@ -105,7 +105,11 @@ final class PhutilDeferredLogTestCase extends PhutilTestCase {
 
     $futures = array();
     for ($ii = 0; $ii < $n_writers; $ii++) {
-      $futures[] = new ExecFuture('%s %d %s', $bin, $n_lines, (string)$tmp);
+      $futures[] = new ExecFuture(
+        'php -f %s -- %d %s',
+        $bin,
+        $n_lines,
+        (string)$tmp);
     }
 
     id(new FutureIterator($futures))

@@ -48,8 +48,7 @@ final class PhutilPHPObjectProtocolChannelTestCase extends PhutilTestCase {
     $root = dirname(phutil_get_library_root('arcanist'));
     $bin = $root.'/support/unit/cat.php';
 
-
-    $future = new ExecFuture('php -f %s', $bin);
+    $future = new ExecFuture('php -f %R', $bin);
 
     // If this test breaks, we want to explode, not hang forever.
     $future->setTimeout(5);
