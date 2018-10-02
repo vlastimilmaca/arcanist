@@ -3,7 +3,6 @@
 final class PhutilOAuth1FutureTestCase extends PhutilTestCase {
 
   public function testOAuth1SigningWithOldSpecExmaples() {
-
     // NOTE: These examples are from an old version of the OAuth 1 spec,
     // so they might not be totally accurate.
 
@@ -38,7 +37,6 @@ final class PhutilOAuth1FutureTestCase extends PhutilTestCase {
   }
 
   public function testOAuth1SigningWithTwitterExamples() {
-
     // NOTE: This example is from Twitter.
     // https://dev.twitter.com/docs/auth/creating-signature
 
@@ -63,6 +61,10 @@ final class PhutilOAuth1FutureTestCase extends PhutilTestCase {
   }
 
   public function testOAuth1SigningWithJIRAExamples() {
+    if (!function_exists('openssl_pkey_get_private')) {
+      $this->assertSkipped(
+        pht('Required "openssl" extension is not installed.'));
+    }
 
     // NOTE: This is an emprically example against JIRA v6.0.6, in that the
     // code seems to work when actually authing. It primarily serves as a check
@@ -155,5 +157,6 @@ EOKEY;
       '5e63e65237e2b8078426996d5ef1a706',
       md5($future->getSignature()));
   }
+
 
 }
