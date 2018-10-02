@@ -584,18 +584,6 @@ final class ExecFuture extends PhutilExecutableFuture {
 
       $pipes = array();
 
-      if ($is_windows) {
-        // See T4395. proc_open under Windows uses "cmd /C [cmd]", which will
-        // strip the first and last quote when there aren't exactly two quotes
-        // (and some other conditions as well). This results in a command that
-        // looks like `command" "path to my file" "something something` which is
-        // clearly wrong. By surrounding the command string with quotes we can
-        // be sure this process is harmless.
-        if (strpos($unmasked_command, '"') !== false) {
-          $unmasked_command = '"'.$unmasked_command.'"';
-        }
-      }
-
       if ($this->hasEnv()) {
         $env = $this->getEnv();
       } else {
@@ -644,7 +632,10 @@ final class ExecFuture extends PhutilExecutableFuture {
         $spec,
         $pipes,
         $cwd,
-        $env);
+        $env,
+        array(
+          'bypass_shell' => true,
+        ));
 
       if ($is_windows) {
         fclose($stdout_handle);
