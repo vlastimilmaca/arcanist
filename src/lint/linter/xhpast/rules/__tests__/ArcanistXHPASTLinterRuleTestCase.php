@@ -29,6 +29,17 @@ abstract class ArcanistXHPASTLinterRuleTestCase
    * @return ArcanistXHPASTLinterRule
    */
   protected function getLinterRule() {
+    if (!PhutilXHPASTBinary::isAvailable()) {
+      try {
+        self::build();
+      } catch (Exception $ex) {
+        $this->assertSkipped(
+          pht(
+            'XHPAST binary is not available and could not be built: %s',
+            $ex->getMessage()));
+      }
+    }
+
     $class = get_class($this);
     $matches = null;
 
