@@ -20,6 +20,8 @@ abstract class PhutilTestCase extends Phobject {
   private $paths;
   private $renderer;
 
+  private static $executables = array();
+
 
 /* -(  Making Test Assertions  )--------------------------------------------- */
 
@@ -761,9 +763,7 @@ abstract class PhutilTestCase extends Phobject {
   }
 
   final protected function assertExecutable($binary) {
-    static $executables = array();
-
-    if (!isset($executables[$binary])) {
+    if (!isset(self::$executables[$binary])) {
       switch ($binary) {
         case 'xhpast':
           $ok = true;
@@ -779,10 +779,11 @@ abstract class PhutilTestCase extends Phobject {
           $ok = Filesystem::binaryExists($binary);
           break;
       }
-      $executables[$binary] = $ok;
+
+      self::$executables[$binary] = $ok;
     }
 
-    if (!$executables[$binary]) {
+    if (!self::$executables[$binary]) {
       $this->assertSkipped(
         pht('Required executable "%s" is not available.', $binary));
     }
