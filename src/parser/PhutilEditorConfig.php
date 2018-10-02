@@ -110,6 +110,10 @@ final class PhutilEditorConfig extends Phobject {
     foreach ($configs as $config) {
       list($path_prefix, $editorconfig) = $config;
 
+      // Normalize directory separators to "/". The ".editorconfig" standard
+      // uses only "/" as a directory separator, not "\".
+      $path_prefix = str_replace(DIRECTORY_SEPARATOR, '/', $path_prefix);
+
       foreach ($editorconfig as $glob => $properties) {
         if (!$glob) {
           continue;
