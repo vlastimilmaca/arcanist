@@ -905,7 +905,7 @@ final class Filesystem extends Phobject {
 
     if (phutil_is_windows()) {
       $parts = trim($path, '/\\');
-      $parts = preg_split('([/\\])', $parts);
+      $parts = preg_split('([/\\\\])', $parts);
 
       // Normalize the directory separators in the path. If we find a parent
       // below, we'll overwrite this with a better resolved path.
