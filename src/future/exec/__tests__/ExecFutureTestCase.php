@@ -18,6 +18,11 @@ final class ExecFutureTestCase extends PhutilTestCase {
     return new ExecFuture('php -f %R', $bin);
   }
 
+  private function newSleep($duration) {
+    $bin = $this->getSupportExecutable('sleep');
+    return new ExecFuture('php -f %R -- %s', $bin, $duration);
+  }
+
   public function testKeepPipe() {
     // NOTE: This is mostly testing the semantics of $keep_pipe in write().
 
@@ -56,7 +61,7 @@ final class ExecFutureTestCase extends PhutilTestCase {
     // NOTE: This tests interactions between the resolve() timeout and the
     // ExecFuture timeout, which are similar but not identical.
 
-    $future = id(new ExecFuture('sleep 32000'))->start();
+    $future = $this->newSleep(32000)->start();
     $future->setTimeout(32000);
 
     // We expect this to return in 0.01s.
@@ -73,7 +78,7 @@ final class ExecFutureTestCase extends PhutilTestCase {
   public function testTerminateWithoutStart() {
     // We never start this future, but it should be fine to kill a future from
     // any state.
-    $future = new ExecFuture('sleep 1');
+    $future = $this->newSleep(1);
     $future->resolveKill();
 
     $this->assertTrue(true);
@@ -83,7 +88,7 @@ final class ExecFutureTestCase extends PhutilTestCase {
     // NOTE: This is partly testing that we choose appropriate select wait
     // times; this test should run for significantly less than 1 second.
 
-    $future = new ExecFuture('sleep 32000');
+    $future = $this->newSleep(32000);
     list($err) = $future->setTimeout(0.01)->resolve();
 
     $this->assertTrue($err > 0);
@@ -93,7 +98,7 @@ final class ExecFutureTestCase extends PhutilTestCase {
   public function testMultipleTimeoutsTestShouldRunLessThan1Sec() {
     $futures = array();
     for ($ii = 0; $ii < 4; $ii++) {
-      $futures[] = id(new ExecFuture('sleep 32000'))->setTimeout(0.01);
+      $futures[] = $this->newSleep(32000)->setTimeout(0.01);
     }
 
     foreach (new FutureIterator($futures) as $future) {
