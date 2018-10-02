@@ -45,8 +45,7 @@ final class PhutilPHPObjectProtocolChannelTestCase extends PhutilTestCase {
   }
 
   public function testCloseExecWriteChannel() {
-    $root = dirname(phutil_get_library_root('arcanist'));
-    $bin = $root.'/support/unit/cat.php';
+    $bin = $this->getSupportExecutable('cat');
 
     $future = new ExecFuture('php -f %R', $bin);
 

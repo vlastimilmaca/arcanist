@@ -56,14 +56,16 @@ final class PhutilCsprintfTestCase extends PhutilTestCase {
   }
 
   public function testPasswords() {
+    $bin = $this->getSupportExecutable('echo');
+
     // Normal "%s" doesn't do anything special.
-    $command = csprintf('echo %s', 'hunter2trustno1');
+    $command = csprintf('php -f %R -- %s', $bin, 'hunter2trustno1');
     $this->assertTrue(strpos($command, 'hunter2trustno1') !== false);
 
     // "%P" takes a PhutilOpaqueEnvelope.
     $caught = null;
     try {
-      csprintf('echo %P', 'hunter2trustno1');
+      csprintf('php -f %R -- %P', $bin, 'hunter2trustno1');
     } catch (Exception $ex) {
       $caught = $ex;
     }
@@ -71,7 +73,10 @@ final class PhutilCsprintfTestCase extends PhutilTestCase {
 
 
     // "%P" masks the provided value.
-    $command = csprintf('echo %P', new PhutilOpaqueEnvelope('hunter2trustno1'));
+    $command = csprintf(
+      'php -f %R -- %P',
+      $bin,
+      new PhutilOpaqueEnvelope('hunter2trustno1'));
     $this->assertFalse(strpos($command, 'hunter2trustno1'));
 
 

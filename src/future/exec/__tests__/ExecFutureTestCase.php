@@ -14,9 +14,7 @@ final class ExecFutureTestCase extends PhutilTestCase {
   }
 
   private function newCat() {
-    $root = dirname(phutil_get_library_root('arcanist'));
-    $bin = $root.'/support/unit/cat.php';
-
+    $bin = $this->getSupportExecutable('cat');
     return new ExecFuture('php -f %R', $bin);
   }
 
@@ -109,8 +107,9 @@ final class ExecFutureTestCase extends PhutilTestCase {
   public function testMultipleResolves() {
     // It should be safe to call resolve(), resolvex(), resolveKill(), etc.,
     // as many times as you want on the same process.
+    $bin = $this->getSupportExecutable('echo');
 
-    $future = new ExecFuture('echo quack');
+    $future = new ExecFuture('php -f %R -- quack', $bin);
     $future->resolve();
     $future->resolvex();
     list($err) = $future->resolveKill();

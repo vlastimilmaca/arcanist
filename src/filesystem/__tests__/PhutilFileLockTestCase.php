@@ -172,15 +172,14 @@ final class PhutilFileLockTestCase extends PhutilTestCase {
 
   private function buildLockFuture(/* ... */) {
     $argv = func_get_args();
-    $root = dirname(phutil_get_library_root('arcanist'));
-    $bin = $root.'/support/unit/lock.php';
+    $bin = $this->getSupportExecutable('lock');
 
     if (phutil_is_windows()) {
-      $future = new ExecFuture('php -f %s -- %Ls', $bin, $argv);
+      $future = new ExecFuture('php -f %R -- %Ls', $bin, $argv);
     } else {
       // NOTE: Use `exec` so this passes on Ubuntu, where the default `dash`
       // shell will eat any kills we send during the tests.
-      $future = new ExecFuture('exec php -f %s -- %Ls', $bin, $argv);
+      $future = new ExecFuture('exec php -f %R -- %Ls', $bin, $argv);
     }
 
     $future->start();

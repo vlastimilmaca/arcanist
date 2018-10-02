@@ -3,8 +3,7 @@
 final class FutureIteratorTestCase extends PhutilTestCase {
 
   public function testAddingFuture() {
-    $root = dirname(phutil_get_library_root('arcanist'));
-    $bin = $root.'/support/unit/cat.php';
+    $bin = $this->getSupportExecutable('cat');
 
     $future1 = new ExecFuture('php -f %R', $bin);
     $future2 = new ExecFuture('php -f %R', $bin);

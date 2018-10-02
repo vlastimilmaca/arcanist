@@ -788,4 +788,10 @@ abstract class PhutilTestCase extends Phobject {
     }
   }
 
+  final protected function getSupportExecutable($executable) {
+    $root = dirname(phutil_get_library_root('arcanist'));
+    return $root.'/support/unit/'.$executable.'.php';
+  }
+
+
 }
