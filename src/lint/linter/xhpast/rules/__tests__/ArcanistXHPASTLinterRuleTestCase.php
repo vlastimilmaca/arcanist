@@ -29,15 +29,23 @@ abstract class ArcanistXHPASTLinterRuleTestCase
    * @return ArcanistXHPASTLinterRule
    */
   protected function getLinterRule() {
-    if (!PhutilXHPASTBinary::isAvailable()) {
-      try {
-        PhutilXHPASTBinary::build();
-      } catch (Exception $ex) {
-        $this->assertSkipped(
-          pht(
-            'XHPAST binary is not available and could not be built: %s',
-            $ex->getMessage()));
+    static $skip_xhpast;
+
+    if ($skip_xhpast === null) {
+      $skip_xhpast = false;
+      if (!PhutilXHPASTBinary::isAvailable()) {
+        try {
+          PhutilXHPASTBinary::build();
+        } catch (Exception $ex) {
+          $skip_xhpast = true;
+        }
       }
+    }
+
+    if ($skip_xhpast) {
+      $this->assertSkipped(
+        pht(
+          'XHPAST binary is not available and could not be built.'));
     }
 
     $class = get_class($this);
