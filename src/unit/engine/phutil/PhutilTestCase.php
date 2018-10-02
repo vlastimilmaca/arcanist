@@ -779,10 +779,10 @@ abstract class PhutilTestCase extends Phobject {
           $ok = Filesystem::binaryExists($binary);
           break;
       }
-      $executable[$binary] = $ok;
+      $executables[$binary] = $ok;
     }
 
-    if (!$executable[$binary]) {
+    if (!$executables[$binary]) {
       $this->assertSkipped(
         pht('Required executable "%s" is not available.', $binary));
     }
