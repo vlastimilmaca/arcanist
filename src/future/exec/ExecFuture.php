@@ -650,10 +650,23 @@ final class ExecFuture extends PhutilExecutableFuture {
       }
 
       if (!is_resource($proc)) {
-        throw new Exception(
+        // When you run an invalid command on a Linux system, the "proc_open()"
+        // works and then the process (really a "/bin/sh -c ...") exits after
+        // it fails to resolve the command.
+
+        // When you run an invalid command on a Windows system, we bypass the
+        // shell and the "proc_open()" itself fails. Throw a "CommandException"
+        // here for consistency with the Linux behavior in this common failure
+        // case.
+
+        throw new CommandException(
           pht(
             'Call to "proc_open()" to open a subprocess failed: %s',
-            $err));
+            $err),
+          $this->command,
+          1,
+          '',
+          '');
       }
 
       if ($is_windows) {
