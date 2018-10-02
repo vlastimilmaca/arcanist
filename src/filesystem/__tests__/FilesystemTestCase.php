@@ -111,17 +111,6 @@ final class FilesystemTestCase extends PhutilTestCase {
         array(),
       ),
 
-      'fictional paths work' => array(
-        '/x/y/z',
-        '/',
-        array(
-          '/x/y/z',
-          '/x/y',
-          '/x',
-          '/',
-        ),
-      ),
-
     );
 
     foreach ($test_cases as $test_case) {
