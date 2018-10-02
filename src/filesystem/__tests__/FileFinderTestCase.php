@@ -125,7 +125,15 @@ final class FileFinderTestCase extends PhutilTestCase {
   }
 
   public function testFinderWithGlobMagic() {
-    $is_windows = phutil_is_windows();
+    if (phutil_is_windows()) {
+      // We can't write files with "\" since this is the path separator.
+      // We can't write files with "*" since Windows rejects them.
+      // This doesn't leave us too many interesting paths to test, so just
+      // skip this test case under Windows.
+      $this->assertSkipped(
+        pht(
+          'Windows can not write files with sufficiently absurd names.'));
+    }
 
     // Fill a temporary directory with all this magic garbage so we don't have
     // to check a bunch of files with backslashes in their names into version
@@ -133,17 +141,12 @@ final class FileFinderTestCase extends PhutilTestCase {
     $tmp_dir = Filesystem::createTemporaryDirectory();
 
     $crazy_magic = array(
+      'backslash\\.\\*',
       'star-*.*',
       'star-*.txt',
       'star.t*t',
       'star.tesseract',
     );
-
-    // Under Windows, the backslash is a directory separator so we can not
-    // create a file with the reasonable name "backslash\.\*".
-    if (!$is_windows) {
-      $crazy_magic[] = 'backslash\\.\\*';
-    }
 
     foreach ($crazy_magic as $sketchy_path) {
       Filesystem::writeFile($tmp_dir.'/'.$sketchy_path, '.');
@@ -183,16 +186,14 @@ final class FileFinderTestCase extends PhutilTestCase {
         'star-*.*',
       ));
 
-    if (!$is_windows) {
-      $this->assertFinder(
-        pht('Glob Magic, Backslash Suffix'),
-        $this->newFinder($tmp_dir)
-          ->withType('f')
-          ->withSuffix('\\*'),
-        array(
-          'backslash\\.\\*',
-        ));
-    }
+    $this->assertFinder(
+      pht('Glob Magic, Backslash Suffix'),
+      $this->newFinder($tmp_dir)
+        ->withType('f')
+        ->withSuffix('\\*'),
+      array(
+        'backslash\\.\\*',
+      ));
 
     $this->assertFinder(
       pht('Glob Magic, With Globs'),
