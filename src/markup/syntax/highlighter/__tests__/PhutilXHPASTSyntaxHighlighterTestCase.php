@@ -14,6 +14,11 @@ final class PhutilXHPASTSyntaxHighlighterTestCase extends PhutilTestCase {
   }
 
   public function testBuiltinClassnames() {
+    if (!PhutilXHPASTBinary::makeAvailable()) {
+      $this->assertSkipped(
+        pht('XHPAST binary is not available and could not be built.'));
+    }
+
     $this->assertEqual(
       $this->read('builtin-classname.expect'),
       (string)$this->highlight($this->read('builtin-classname.source')),

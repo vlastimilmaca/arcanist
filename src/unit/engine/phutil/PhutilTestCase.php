@@ -110,15 +110,24 @@ abstract class PhutilTestCase extends Phobject {
 
     $output .= "\n";
 
+    static $have_diff;
+    if ($have_diff === null) {
+      $have_diff = Filesystem::binaryExists('diff');
+    }
+
     if (strpos($expect, "\n") === false && strpos($result, "\n") === false) {
       $output .= pht("Expected: %s\n  Actual: %s", $expect, $result);
-    } else {
+    } else if ($have_diff) {
       $output .= pht(
         "Expected vs Actual Output Diff\n%s",
         ArcanistDiffUtils::renderDifferences(
           $expect,
           $result,
           $lines = 0xFFFF));
+    } else {
+      // On systems without `diff`, including Windows, just show the raw
+      // values instead of using `diff` to compare them.
+      $output .= "EXPECTED\n{$expect}\n\nACTUAL\n{$result}\n";
     }
 
     $this->failTest($output);
