@@ -31,7 +31,7 @@ abstract class ArcanistXHPASTLinterRuleTestCase
   protected function getLinterRule() {
     if (!PhutilXHPASTBinary::isAvailable()) {
       try {
-        self::build();
+        PhutilXHPASTBinary::build();
       } catch (Exception $ex) {
         $this->assertSkipped(
           pht(
