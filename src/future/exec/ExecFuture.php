@@ -637,10 +637,26 @@ final class ExecFuture extends PhutilExecutableFuture {
           'bypass_shell' => true,
         ));
 
+      if ($trap) {
+        $err = $trap->getErrorsAsString();
+        $trap->destroy();
+      } else {
+        $err = error_get_last();
+      }
+
       if ($is_windows) {
         fclose($stdout_handle);
         fclose($stderr_handle);
+      }
 
+      if (!is_resource($proc)) {
+        throw new Exception(
+          pht(
+            'Call to "proc_open()" to open a subprocess failed: %s',
+            $err));
+      }
+
+      if ($is_windows) {
         $stdout_handle = fopen($stdout_file, 'rb');
         if (!$stdout_handle) {
           throw new Exception(
@@ -665,21 +681,6 @@ final class ExecFuture extends PhutilExecutableFuture {
 
         $this->windowsStdoutTempFile = $stdout_file;
         $this->windowsStderrTempFile = $stderr_file;
-      }
-
-      if ($trap) {
-        $err = $trap->getErrorsAsString();
-        $trap->destroy();
-      } else {
-        $err = error_get_last();
-      }
-
-      if (!is_resource($proc)) {
-        throw new Exception(
-          pht(
-            'Failed to `%s`: %s',
-            'proc_open()',
-            $err));
       }
 
       $this->pipes = $pipes;
