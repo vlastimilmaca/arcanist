@@ -170,14 +170,21 @@ final class PhutilFileLockTestCase extends PhutilTestCase {
     throw new Exception(pht('Unable to hold lock in external process!'));
   }
 
-  private function buildLockFuture($flags, $file) {
+  private function buildLockFuture(/* ... */) {
+    $argv = func_get_args();
     $root = dirname(phutil_get_library_root('arcanist'));
     $bin = $root.'/support/unit/lock.php';
 
-    // NOTE: Use `exec` so this passes on Ubuntu, where the default `dash` shell
-    // will eat any kills we send during the tests.
-    $future = new ExecFuture('exec php %s %C %s', $bin, $flags, $file);
+    if (phutil_is_windows()) {
+      $future = new ExecFuture('php -f %s -- %Ls', $bin, $argv);
+    } else {
+      // NOTE: Use `exec` so this passes on Ubuntu, where the default `dash`
+      // shell will eat any kills we send during the tests.
+      $future = new ExecFuture('exec php -f %s -- %Ls', $bin, $argv);
+    }
+
     $future->start();
+
     return $future;
   }
 
