@@ -39,14 +39,20 @@ final class PhutilCsprintfTestCase extends PhutilTestCase {
   }
 
   public function testNoPowershell() {
-    if (!phutil_is_windows()) {
-      $cmd = csprintf('%s', '#');
-      $cmd->setEscapingMode(PhutilCommandString::MODE_DEFAULT);
-
-      $this->assertEqual(
-        '\'#\'',
-        (string)$cmd);
+    if (phutil_is_windows()) {
+      // TOOLSETS: Restructure this. We must skip because tests fail if they
+      // do not make any assertions.
+      $this->assertSkipped(
+        pht(
+          'This test can not currently run under Windows.'));
     }
+
+    $cmd = csprintf('%s', '#');
+    $cmd->setEscapingMode(PhutilCommandString::MODE_DEFAULT);
+
+    $this->assertEqual(
+      '\'#\'',
+      (string)$cmd);
   }
 
   public function testPasswords() {
